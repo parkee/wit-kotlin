@@ -18,7 +18,7 @@ class WitConverseTemplate(
 
     override fun converse(sessionId: String,
                           query: String?,
-                          context: String?): WitConverseResult {
+                          context: Map<String, String>?): WitConverseResult {
 
         val parameters = listOf(
                 "session_id" to sessionId,

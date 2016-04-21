@@ -16,7 +16,7 @@ class WitIntentTemplate(
     private val BASE_URL = "https://api.wit.ai/message"
 
     override fun getSentenceMeaning(query: String,
-                                    context: String?,
+                                    context: Map<String, String>?,
                                     messageId: String?,
                                     threadId: String?,
                                     numberOfBestOutcomes: Int?): WitGetIntentResult {

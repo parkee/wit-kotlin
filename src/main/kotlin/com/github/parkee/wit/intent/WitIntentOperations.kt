@@ -4,7 +4,7 @@ import com.github.parkee.wit.intent.entity.WitGetIntentResult
 
 interface WitIntentOperations {
     fun getSentenceMeaning(query: String,
-                           context: String? = null,
+                           context: Map<String, String>? = null,
                            messageId: String? = null,
                            threadId: String? = null,
                            numberOfBestOutcomes: Int? = null): WitGetIntentResult
