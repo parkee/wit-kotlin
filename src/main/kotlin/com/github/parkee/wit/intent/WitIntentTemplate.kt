@@ -1,9 +1,9 @@
 package com.github.parkee.wit.intent
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.parkee.wit.exception.WitException
 import com.github.parkee.wit.intent.entity.WitGetIntentResult
+import com.github.parkee.wit.json.fromJsonTo
 
 /**
  * Created by parkee on 4/21/16.
@@ -16,7 +16,7 @@ class WitIntentTemplate(
     private val BASE_URL = "https://api.wit.ai/message"
 
     override fun getSentenceMeaning(query: String,
-                                    context: Map<String, String>?,
+                                    context: Map<String, Any>?,
                                     messageId: String?,
                                     threadId: String?,
                                     numberOfBestOutcomes: Int?): WitGetIntentResult {
@@ -43,7 +43,7 @@ class WitIntentTemplate(
             throw WitException("Error with code ${response.httpStatusCode} and body ${String(errorData)}")
         }
 
-        return jacksonObjectMapper().readValue(successResponse, WitGetIntentResult::class.java)
+        return successResponse?.fromJsonTo(WitGetIntentResult::class) ?: throw WitException("Wit returned empty result")
     }
 }
 

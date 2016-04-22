@@ -7,6 +7,7 @@ enum class ConverseResultType(private val type: String) {
     MERGE("merge"), // first bot action after a user message
     MSG("msg"), // the bot has something to say
     ACTION("action"), // the bot has something to do
+    ERROR("error"),
     STOP("stop"); // the bot is waiting to proceed
 
     @JsonCreator

@@ -1,9 +1,10 @@
 package com.github.parkee.wit.converse
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.kittinunf.fuel.Fuel
 import com.github.parkee.wit.converse.entity.WitConverseResult
 import com.github.parkee.wit.exception.WitException
+import com.github.parkee.wit.json.fromJsonTo
+import com.github.parkee.wit.json.toJsonAsBytes
 
 /**
  * Created by parkee on 4/21/16.
@@ -18,15 +19,16 @@ class WitConverseTemplate(
 
     override fun converse(sessionId: String,
                           query: String?,
-                          context: Map<String, String>?): WitConverseResult {
+                          context: Map<String, Any>): WitConverseResult {
 
+        val serializedContext = context.toJsonAsBytes()
         val parameters = listOf(
                 "session_id" to sessionId,
-                "q" to query,
-                "context" to context)
+                "q" to query)
 
         val (request, response, result) = Fuel.post("$BASE_URL?${queryFromParameters(parameters)}")
                 .header(headers)
+                .body(serializedContext)
                 .responseString()
 
         val (successResponse, errorResponse) = result
@@ -36,7 +38,7 @@ class WitConverseTemplate(
             throw WitException("Error with code ${response.httpStatusCode} and body ${String(errorData)}")
         }
 
-        return jacksonObjectMapper().readValue(successResponse, WitConverseResult::class.java)
+        return successResponse?.fromJsonTo(WitConverseResult::class) ?: throw WitException("Wit returned empty result")
     }
 
     private fun queryFromParameters(params: List<Pair<String, Any?>>?): String {
