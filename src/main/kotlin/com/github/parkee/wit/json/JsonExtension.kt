@@ -7,22 +7,30 @@ import kotlin.reflect.KClass
 /**
  * Created by parkee on 4/22/16.
  */
-fun Any.toJsonAsString(): String {
+internal fun Any.toJsonAsString(): String {
     return jacksonObjectMapper().writeValueAsString(this)
 }
 
-fun Any.toJsonAsBytes(): ByteArray {
+internal fun Any.toJsonAsBytes(): ByteArray {
     return jacksonObjectMapper().writeValueAsBytes(this)
 }
 
-fun <T> String.fromJsonTo(clazz: Class<T>): T {
+internal fun <T> String.fromJsonTo(clazz: Class<T>): T {
     return jacksonObjectMapper().readValue(this, clazz)
 }
 
-fun <T : Any> String.fromJsonTo(clazz: KClass<T>): T {
+internal fun <T : Any> String.fromJsonTo(clazz: KClass<T>): T {
     return jacksonObjectMapper().readValue(this, clazz.java)
 }
 
-fun <T> String.fromJsonTo(typeReference: TypeReference<T>): T {
+internal fun <T : Any> ByteArray.fromJsonTo(clazz: KClass<T>): T {
+    return jacksonObjectMapper().readValue(this, clazz.java)
+}
+
+internal fun <T> String.fromJsonTo(typeReference: TypeReference<T>): T {
+    return jacksonObjectMapper().readValue(this, typeReference)
+}
+
+internal fun <T> ByteArray.fromJsonTo(typeReference: TypeReference<T>): T {
     return jacksonObjectMapper().readValue(this, typeReference)
 }

@@ -12,8 +12,8 @@ import com.github.parkee.wit.intent.WitIntentTemplate
  * Created by parkee on 4/20/16.
  */
 class WitClient(
-        val accessToken: String,
-        val acceptHeader: String = "application/vnd.wit.20160330+json",
+        private val accessToken: String,
+        private val acceptHeader: String = "application/vnd.wit.20160330+json",
         // session_id, context, msg -> void
         private val sayFunction: Function3<String, Map<String, Any>, String, Unit>,
         // session_id, context, entities, msg -> context
@@ -54,7 +54,9 @@ class WitClient(
             }
 
             ConverseResultType.MERGE -> {
-                newContext = mergeFunction.invoke(sessionId, newContext, converseResult.entities.orEmpty(), converseResult.message.orEmpty())
+                val entities = converseResult.entities.orEmpty()
+                val resultMessage = converseResult.message.orEmpty()
+                newContext = mergeFunction.invoke(sessionId, newContext, entities, resultMessage)
             }
 
             ConverseResultType.ACTION -> {
