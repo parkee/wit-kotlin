@@ -19,18 +19,18 @@ data class WitEntity(
         @JsonProperty("end") val end: Int?,
         @JsonProperty("entity") val entity: String?
 ) {
-    fun getValueAsString() = value
-    fun getValueAsByte() = value.toByte()
-    fun getValueAsBoolean() = value.toBoolean()
-    fun getValueAsShort() = value.toShort()
-    fun getValueAsInteger() = value.toInt()
-    fun getValueAsLong() = value.toLong()
-    fun getValueAsFloat() = value.toFloat()
-    fun getValueAsDouble() = value.toDouble()
-    fun getValueAsZonedDateTime() = ZonedDateTime.parse(value)
-    fun getValueAsEntity(): WitEntity = value.fromJsonTo(WitEntity::class)
-
-    fun getValueAsZonedDateTimeRange(): Pair<ZonedDateTime, ZonedDateTime> {
+    fun valueAsString() = value
+    fun valueAsByte() = value.toByte()
+    fun valueAsBoolean() = value.toBoolean()
+    fun valueAsShort() = value.toShort()
+    fun valueAsInteger() = value.toInt()
+    fun valueAsLong() = value.toLong()
+    fun valueAsFloat() = value.toFloat()
+    fun valueAsDouble() = value.toDouble()
+    fun valueAsZonedDateTime() = ZonedDateTime.parse(value)
+    fun valueAsEntity(): WitEntity = value.fromJsonTo(WitEntity::class)
+    
+    fun valueAsZonedDateTimeRange(): Pair<ZonedDateTime, ZonedDateTime> {
         val tr = object : TypeReference<Map<String, String>>() {}
         val map: Map<String, String> = value.fromJsonTo(tr)
         val fromDateTime = ZonedDateTime.parse(map["from"])
