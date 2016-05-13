@@ -15,13 +15,13 @@ class WitClient(
         private val accessToken: String,
         private val acceptHeader: String = "application/vnd.wit.20160330+json",
         // session_id, context, msg -> void
-        private val sayFunction: Function3<String, Map<String, Any>, String, Unit>,
+        private val sayFunction: Function3<String, Map<String, Any>, String, Unit>? = null,
         // session_id, context, entities, msg -> context
-        private val mergeFunction: Function4<String, Map<String, Any>, Map<String, List<WitEntity>>, String, Map<String, Any>>,
+        private val mergeFunction: Function4<String, Map<String, Any>, Map<String, List<WitEntity>>, String, Map<String, Any>>? = null,
         // session_id, context, exception -> void
-        private val errorFunction: Function3<String, Map<String, Any>, Throwable, Unit>,
+        private val errorFunction: Function3<String, Map<String, Any>, Throwable, Unit>? = null,
         // session_id, context -> context
-        private val userDefinedFunctions: Map<String, Function2<String, Map<String, Any>, Map<String, Any>>>,
+        private val userDefinedFunctions: Map<String, Function2<String, Map<String, Any>, Map<String, Any>>> = emptyMap(),
         private val intentTemplate: WitIntentTemplate = WitIntentTemplate(accessToken, acceptHeader),
         private val converseTemplate: WitConverseTemplate = WitConverseTemplate(accessToken, acceptHeader)
 ) : WitIntentOperations by intentTemplate, WitConverseOperations by converseTemplate {
@@ -50,21 +50,32 @@ class WitClient(
             ConverseResultType.STOP -> return newContext
 
             ConverseResultType.MSG -> {
+                if (sayFunction == null) {
+                    throw WitException("Say function is not set")
+                }
                 sayFunction.invoke(sessionId, newContext, converseResult.message.orEmpty())
             }
 
             ConverseResultType.MERGE -> {
                 val entities = converseResult.entities.orEmpty()
                 val resultMessage = converseResult.message.orEmpty()
+                if (mergeFunction == null) {
+                    throw WitException("Merge function is not set")
+                }
                 newContext = mergeFunction.invoke(sessionId, newContext, entities, resultMessage)
             }
 
             ConverseResultType.ACTION -> {
-                newContext = userDefinedFunctions[converseResult.action]?.invoke(sessionId, newContext).orEmpty()
+                val userFunction = userDefinedFunctions[converseResult.action] ?:
+                        throw WitException("User function ${converseResult.action} is not defined")
+                newContext = userFunction.invoke(sessionId, newContext).orEmpty()
             }
 
             ConverseResultType.ERROR -> {
-                errorFunction(sessionId, newContext, WitException("Oops, I don't know wit to do"))
+                if (errorFunction == null) {
+                    throw WitException("Error function is not set")
+                }
+                errorFunction.invoke(sessionId, newContext, WitException("Oops, I don't know wit to do"))
             }
 
             else -> WitException("Unknown ConverseResultType") // should never happen
